@@ -3,11 +3,11 @@
   鼠标放在页面上滚动鼠标滚轮，页面会横向移动，而不是竖向移动
 
 ## 代码
->class MouseScrollToLeft {  
->>constructor(obj, father) {  
->>>this.obj = obj  
->>>this.father = father  
->>}  
+  class MouseScrollToLeft {  
+    constructor(obj, father) {  
+      this.obj = obj  
+      this.father = father  
+    }  
     init() {  
       this.obj.style.left = '0px'  
       this.father.style.overflow = 'hidden'  
