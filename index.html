@@ -1,1 +1,124 @@
-js-demo
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>滚轮右划</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      div.toLeft {
+        width: 200%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        position: relative;
+        top: 0px;
+        left: 0px;
+        transition: left .5s;
+        display: flex;
+      }
+
+      .toLeft div {
+        width: 10%;
+        height: 10vw;
+        background-color: darkcyan;
+        display: inline-block;
+      }
+
+      .toLeft div:nth-child(2n) {
+        background-color: chartreuse;
+      }
+
+      .toLeft div:nth-child(2n + 1) {
+        background-color: darkmagenta;
+      }
+
+      .toLeft div:nth-child(3n) {
+        background-color: coral;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toLeft">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+      <div>5</div>
+      <div>6</div>
+      <div>7</div>
+      <div>8</div>
+      <div>9</div>
+      <div>0</div>
+    </div>
+  </body>
+  <script>
+    /**
+     * MouseScrollToLeft - 鼠标滚轮横向移动(无滚动条）
+     * obj - 滚动主体DOM
+     * father - obj的父级元素 用于监听obj的鼠标监听事件 
+     */
+    class MouseScrollToLeft {
+      constructor(obj, father) {
+        this.obj = obj
+        this.father = father
+      }
+      init() {
+        this.obj.style.left = '0px'
+        this.father.style.overflow = 'hidden'
+        this.father.addEventListener("wheel", (e) => this.mouseScroll(e), false)
+      }
+      mouseScroll(e = window.event) {
+        // wheelDelta ie 谷歌; detail 火狐
+        const key = e.wheelDelta ? 'wheelDelta' : (e.detail ? 'detail' : '')
+
+        const num = Number(this.obj.style.left.split('p')[0]) + e[key] / 2
+        this.obj.style.left = num > 0 || Math.abs(num) > this.father.clientWidth ? this.obj.style.left : num + 'px'
+
+        // 左边触底 归0
+        this.obj.style.left = num >= 0 ? 0 : this.obj.style.left
+
+        // 右边触底 left 为obj宽度和father宽度差值
+        this.obj.style.left = Math.abs(num) >= this.obj.clientWidth - this.father.clientWidth ?
+          this.father.clientWidth - this.obj.clientWidth + 'px' :
+          this.obj.style.left
+      }
+    }
+
+    const obj = document.getElementsByClassName('toLeft')[0]
+    const html = document.getElementsByTagName('html')[0]
+    const ToLeft = new MouseScrollToLeft(obj, html).init()
+
+    function originFoo() {
+      window.onmousewheel = document.onmousewheel = mouseScroll
+      // if (document.addEventListener) { // 火狐
+      // document.addEventListener('DOMMouseScroll', mouseScroll, false)
+      // } else { // ie 谷歌
+      // window.onmousewheel = document.onmousewheel = mouseScroll
+      // }
+      function mouseScroll(e) { // 监听滚轮
+        e = e || window.event
+        const obj = document.getElementsByClassName('toLeft')[0]
+        const html = document.getElementsByTagName('html')[0]
+        const key = e.wheelDelta ? 'wheelDelta' : (e.detail ? 'detail' : '') // wheelDelta ie 谷歌; detail 火狐
+        const num = Number(obj.style.left.split('p')[0]) + e[key] / 2
+        obj.style.left = num > 0 || Math.abs(num) > html.clientWidth ? obj.style.left : num + 'px'
+        obj.style.left = num >= 0 ? 0 : obj.style.left // 左边触底 归0
+        obj.style.left = Math.abs(num) >= obj.clientWidth - html.clientWidth ? // 右边触底 left 为 div宽度和html宽度差值
+          html.clientWidth - obj.clientWidth + 'px' :
+          obj.style.left
+      }
+    }
+  </script>
+</html>
