@@ -66,11 +66,19 @@
   </div> -->
 </body>
 <script>
+  /**
+  * LOINGS - 生成loding条
+  * num - 生成的loding条数量
+  * timer - loading条变化的速度
+  * 
+  */
   class LODINGS {
-    constructor(num) {
+    constructor(num, timer) {
       this.num = num || 5
       this.obj = null
       this.container = null
+      this.colors = [ '#5eb7b7', '#96d1c7', '#fc7978', '#ffafb0', '#dfddc7' ]
+      this.timer = 380
     }
     inits() {
       const objStyle = { // Dom元素样式
@@ -87,22 +95,52 @@
       this.createContainer()
     }
     createContainer() {
+      const wid = this.num * 10
       const style = {
-        width: '100px',
+        width: wid + 'px',
         height: '30px',
         display: 'flex',
-        marginLeft: 'calc(50vw - 50px)',
+        marginLeft: 'calc(50vw - '+ wid/2 +'px)',
         marginTop: 'calc(50vh - 15px)',
       }
       this.container = this.createDom('div', style)
       this.obj.appendChild(this.container)
+      for (let i = 0; i < this.num; i++) {
+        this.createLoadingDom(i)
+      }
+      this.loadingActive()
     }
     createDom(node, style = {}) {
-      const obj = document.createElement('div')
+      const obj = document.createElement(node)
       for(var key in style) {
         obj.style[key] = style[key]
       }
       return obj
+    }
+    createLoadingDom(inv) {
+      const style = {
+        width: '5px',
+        height: '30px',
+        marginRight: '5px',
+        borderRadius: '2px',
+        position: 'relative',
+        top: 0,
+        left: 0,
+        transition: 'height .25s, top .25s',
+        backgroundColor: this.colors[inv]
+      }
+      const loadings = this.createDom('div', style)
+      this.container.appendChild(loadings)
+    }
+    loadingActive() {
+      let num = 0
+      setInterval(() => {
+        Array.from(this.container.children).map((t, i) => {
+          t.style.height = i === num ? '40px' : '30px'
+          t.style.top = i === num ? '-5px' : '0px'
+        })
+        num = num === 4 ? 0 : num + 1
+      }, this.timer)
     }
   }
 
@@ -118,10 +156,10 @@
   //   }, 380)
   // }
   // function ani(fa, num) {
-  //   Array.from(fa.children).map((t, i) => {
-  //     t.style.height = i === num ? '40px' : '30px'
-  //     t.style.top = i === num ? '-5px' : '0px'
-  //   })
+    // Array.from(fa.children).map((t, i) => {
+    //   t.style.height = i === num ? '40px' : '30px'
+    //   t.style.top = i === num ? '-5px' : '0px'
+    // })
   // }
   // lodings()
 </script>
