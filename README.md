@@ -9,5 +9,5 @@
   circle.inits()
   // 设置百分值
   circle.changePercentage(90)
-  // 清除对象
+  // 清除对象  
   circle.clean()
