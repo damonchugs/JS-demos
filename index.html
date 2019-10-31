@@ -75,13 +75,14 @@
   class LODINGS {
     constructor(num, timer) {
       this.num = num || 5
+      this.colors = [ '#5eb7b7', '#96d1c7', '#fc7978', '#ffafb0', '#dfddc7' ]
       this.obj = null
       this.container = null
-      this.colors = [ '#5eb7b7', '#96d1c7', '#fc7978', '#ffafb0', '#dfddc7' ]
-      this.timer = 380
+      this.timer = null
+      this.time = 380
     }
-    inits() {
-      const objStyle = { // Dom元素样式
+    inits() { // 初始化 建立maskDom元素，背景透明黑色
+      const objStyle = {
         width: '100%',
         height: '100%',
         position: 'fixed',
@@ -94,7 +95,7 @@
       document.body.append(this.obj)
       this.createContainer()
     }
-    createContainer() {
+    createContainer() { // 创建LodingDOM父级元素
       const wid = this.num * 10
       const style = {
         width: wid + 'px',
@@ -110,14 +111,14 @@
       }
       this.loadingActive()
     }
-    createDom(node, style = {}) {
+    createDom(node, style = {}) { // 创建DOM以及css样式赋值
       const obj = document.createElement(node)
       for(var key in style) {
         obj.style[key] = style[key]
       }
       return obj
     }
-    createLoadingDom(inv) {
+    createLoadingDom(inv) { // 创建loding动画
       const style = {
         width: '5px',
         height: '30px',
@@ -132,20 +133,32 @@
       const loadings = this.createDom('div', style)
       this.container.appendChild(loadings)
     }
-    loadingActive() {
+    loadingActive() { // 动画
       let num = 0
-      setInterval(() => {
+      this.timer = setInterval(() => {
         Array.from(this.container.children).map((t, i) => {
           t.style.height = i === num ? '40px' : '30px'
           t.style.top = i === num ? '-5px' : '0px'
         })
         num = num === 4 ? 0 : num + 1
-      }, this.timer)
+      }, this.time)
+    }
+    clean() { // 移除DOM
+      clearInterval(this.timer)
+      Array.from(this.container.childNodes).map(t => {
+        this.container.removeChild(t)
+      })
+      this.container.remove()
+      this.obj.remove()
+      this.obj = null
+      this.container = null
+      this.timer = null
+      this.time = 380
     }
   }
 
-  const Lodings = new LODINGS()
-  Lodings.inits()
+  const LD = new LODINGS()
+  LD.inits()
 
   // function lodings() {
   //   const fa = document.getElementsByClassName('divs')[0]
