@@ -73,8 +73,9 @@
   * 
   */
   class LODINGS {
-    constructor(num, timer) {
+    constructor(isClick = false, num, timer) {
       this.num = num || 5
+      this.isClick = isClick
       this.colors = [ '#5eb7b7', '#96d1c7', '#fc7978', '#ffafb0', '#dfddc7' ]
       this.obj = null
       this.container = null
@@ -92,8 +93,18 @@
         backgroundColor: 'rgba(0,0,0, .8)'
       }
       this.obj = this.createDom('div', objStyle)
+      this.obj.className = 'loading-dc'
       document.body.append(this.obj)
       this.createContainer()
+
+      if (this.isClick) {
+        const _this = this
+        this.obj.addEventListener('click', (e) => {
+          if (e.target.className === 'loading-dc') { // 去冒泡行为
+            _this.clean()
+          }
+        }, false)
+      }
     }
     createContainer() { // 创建LodingDOM父级元素
       const wid = this.num * 10
@@ -159,21 +170,5 @@
 
   const LD = new LODINGS()
   LD.inits()
-
-  // function lodings() {
-  //   const fa = document.getElementsByClassName('divs')[0]
-  //   let l = 0
-  //   setInterval(() => {
-  //     ani(fa, l)
-  //     l = l === 4 ? 0 : l + 1
-  //   }, 380)
-  // }
-  // function ani(fa, num) {
-    // Array.from(fa.children).map((t, i) => {
-    //   t.style.height = i === num ? '40px' : '30px'
-    //   t.style.top = i === num ? '-5px' : '0px'
-    // })
-  // }
-  // lodings()
 </script>
 </html>
