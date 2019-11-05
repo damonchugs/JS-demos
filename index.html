@@ -126,7 +126,7 @@
     loadTimeLineRow() { // 设置时间线内容
       let htmls = '<div class="timeline-line-dc"></div>'
       this.panels.map(t => {
-        htmls += `<div class="timeline-row-dc ${t.direction || left}">
+        htmls += `<div class="timeline-row-dc ${t.direction || 'left'}">
                     <div class="timeline-time-dc">${t.time}</div>
                     <div class="timeline-icon-dc"><i class="iconfont">${this.icons[t.icon]}</i></div>
                     <div class="timeline-panel-dc">
