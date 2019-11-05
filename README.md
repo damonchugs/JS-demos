@@ -1,12 +1,9 @@
-## loading
+## timeline
 
-## loading动画
+## 时间线设置
 
 ## 用法
 
-// 创建对象  
-const LD = new LODINGS()  
-// 初始化loading  
-LD.init()  
-// 清除loading  
-LD.clean()  
+1. 添加css  
+2. 按格式输入panels
+3. 创建对象
