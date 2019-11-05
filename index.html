@@ -65,60 +65,102 @@
   </body>
   <script>
     /**
-     * MouseScrollToLeft - 鼠标滚轮横向移动(无滚动条）
-     * obj - 滚动主体DOM
-     * father - obj的父级元素 用于监听obj的鼠标监听事件 
-     */
+    * MouseScrollToLeft - 鼠标滚轮横向移动(无滚动条）
+    * obj - 滚动主体DOM
+    * father - obj的父级元素 用于监听obj的鼠标监听事件
+    */
     class MouseScrollToLeft {
       constructor(obj, father) {
         this.obj = obj
         this.father = father
+        this.phone = {
+          flag: false,
+          start: 0,
+          left: 0
+        }
       }
       init() {
-        this.obj.style.left = '0px'
-        this.father.style.overflow = 'hidden'
-        this.father.addEventListener("wheel", (e) => this.mouseScroll(e), false)
-      }
-      mouseScroll(e = window.event) {
-        // wheelDelta ie 谷歌; detail 火狐
-        const key = e.wheelDelta ? 'wheelDelta' : (e.detail ? 'detail' : '')
+        if (this.father.clientWidth > this.obj.clientWidth) {
+          this.obj.style.margin = '0 auto'
+        } else {
+          this.obj.style.left = '0px'
+          this.father.style.overflow = 'hidden'
 
+          if (!checkNavigator()) { // pc端
+            this.father.addEventListener("wheel", (e) => this.mouseScroll(), false)
+          } else { // 手机端
+            this.touchListener()
+          }
+        }
+      }
+      mouseScroll(e = window.event) { // PC端
+        // wheelDelta ie 谷歌; detail 火狐
+        e.preventDefault()
+        e.cancelBubble = true
+        e.stopPropagation()
+
+        const key = e.wheelDelta ? 'wheelDelta' : (e.detail ? 'detail' : '')
         const num = Number(this.obj.style.left.split('p')[0]) + e[key] / 2
         this.obj.style.left = num > 0 || Math.abs(num) > this.father.clientWidth ? this.obj.style.left : num + 'px'
-
         // 左边触底 归0
         this.obj.style.left = num >= 0 ? 0 : this.obj.style.left
-
         // 右边触底 left 为obj宽度和father宽度差值
         this.obj.style.left = Math.abs(num) >= this.obj.clientWidth - this.father.clientWidth ?
-          this.father.clientWidth - this.obj.clientWidth + 'px' :
-          this.obj.style.left
+        this.father.clientWidth - this.obj.clientWidth + 'px' :
+        this.obj.style.left
       }
+      touchListener() {
+        this.father.addEventListener('touchstart', (e) => this.touchStart(e), false)
+        this.father.addEventListener('touchmove', (e) => this.touchMove(e), false)
+        this.father.addEventListener('touchend', (e) => this.touchEnd(e), false)
+      }
+      touchStart(e) {
+        this.phone.flag = true
+        this.phone.start = e.targetTouches[0].pageX
+        this.phone.left = Number(this.obj.style.left.split('p')[0])
+      }
+      touchMove(e) {
+        let num = this.phone.left + e.targetTouches[0].pageX - this.phone.start
+        // 左边触底 归0
+        num = num > 0 ? 0 : num
+        // 右边触底 归0
+        num = Math.abs(num) <= this.obj.clientWidth - this.father.clientWidth ? num : this.obj.style.left
+        this.obj.style.left=num + 'px' 
+      } 
+      touchEnd() { 
+        this.phone= { flag: false, start: 0, left: 0 } 
+      }
+    }
+    
+      /* 检查是否是手机端 */
+    
+    function checkNavigator() {
+      return navigator.userAgent.match(/(pad|pod|iPhone|iPod|ios|iPad|phone|Android|wOSBrowser|BrowserNG|WebOS)/i)
     }
 
     const obj = document.getElementsByClassName('toLeft')[0]
     const html = document.getElementsByTagName('html')[0]
     const ToLeft = new MouseScrollToLeft(obj, html).init()
 
-    function originFoo() {
-      window.onmousewheel = document.onmousewheel = mouseScroll
-      // if (document.addEventListener) { // 火狐
-      // document.addEventListener('DOMMouseScroll', mouseScroll, false)
-      // } else { // ie 谷歌
-      // window.onmousewheel = document.onmousewheel = mouseScroll
-      // }
-      function mouseScroll(e) { // 监听滚轮
-        e = e || window.event
-        const obj = document.getElementsByClassName('toLeft')[0]
-        const html = document.getElementsByTagName('html')[0]
-        const key = e.wheelDelta ? 'wheelDelta' : (e.detail ? 'detail' : '') // wheelDelta ie 谷歌; detail 火狐
-        const num = Number(obj.style.left.split('p')[0]) + e[key] / 2
-        obj.style.left = num > 0 || Math.abs(num) > html.clientWidth ? obj.style.left : num + 'px'
-        obj.style.left = num >= 0 ? 0 : obj.style.left // 左边触底 归0
-        obj.style.left = Math.abs(num) >= obj.clientWidth - html.clientWidth ? // 右边触底 left 为 div宽度和html宽度差值
-          html.clientWidth - obj.clientWidth + 'px' :
-          obj.style.left
-      }
-    }
+    // function originFoo() {
+    //   window.onmousewheel = document.onmousewheel = mouseScroll
+    //   // if (document.addEventListener) { // 火狐
+    //   // document.addEventListener('DOMMouseScroll', mouseScroll, false)
+    //   // } else { // ie 谷歌
+    //   // window.onmousewheel = document.onmousewheel = mouseScroll
+    //   // }
+    //   function mouseScroll(e) { // 监听滚轮
+    //     e = e || window.event
+    //     const obj = document.getElementsByClassName('toLeft')[0]
+    //     const html = document.getElementsByTagName('html')[0]
+    //     const key = e.wheelDelta ? 'wheelDelta' : (e.detail ? 'detail' : '') // wheelDelta ie 谷歌; detail 火狐
+    //     const num = Number(obj.style.left.split('p')[0]) + e[key] / 2
+    //     obj.style.left = num > 0 || Math.abs(num) > html.clientWidth ? obj.style.left : num + 'px'
+    //     obj.style.left = num >= 0 ? 0 : obj.style.left // 左边触底 归0
+    //     obj.style.left = Math.abs(num) >= obj.clientWidth - html.clientWidth ? // 右边触底 left 为 div宽度和html宽度差值
+    //       html.clientWidth - obj.clientWidth + 'px' :
+    //       obj.style.left
+    //   }
+    // }
   </script>
 </html>
