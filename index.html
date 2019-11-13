@@ -88,12 +88,31 @@
   /**
   * Messages - 弹窗
   * msg - 弹出的文字
-  * type - 弹窗的样式
-  * 
+  * title - 确认框的标题
+  * function - 确认框确定之后执行的函数
   */
   class Messages {
     constructor() {
       this.obj = null
+      this.msgNodes = {
+        bar: {
+          obj: null,
+          parent: null,
+          style: {
+            fontSize: '14px',
+            padding: '5px 10px',
+            color: 'white',
+            borderRadius: '4px',
+            position: 'fixed',
+            bottom: '5vh',
+            left: 0,
+            backgroundColor: '#525252',
+            opacity: 0,
+            transition: 'opacity .5s'
+          },
+          text: null
+        }
+      }
       this.nodes = {
         bar: {
           obj: null,
@@ -185,30 +204,63 @@
         }
       }
     }
-    init(m) {
+    init(m) { // 判断是提示框还是确认框
       if (typeof m === 'string') {
         this.msg(m)
       } else {
         this.confim(m)
       }
     }
-    msg(m) {
-      alert(m)
+    msg(m) { // 提示框
+      this.addDom('msgNodes', 'bar', m)
+        .then(() => {
+          const w = this.msgNodes['bar'].obj.clientWidth
+          this.msgNodes['bar'].obj.style.left = `calc(50vw - ${w}px/2)`
+          this.msgNodes['bar'].obj.style.opacity = 1
+          setTimeout(() => { this.msgNodes['bar'].obj.style.opacity = 0 }, 2500)
+          setTimeout(() => this.clean('msgNodes'), 3000)
+        })
+        .catch(err => {
+          console.error('创建失败！！！' + err)
+        })
     }
-    confim(m) {
-      this.nodes['content'].text = m.msg
-      for (var key in this.nodes) {
-        const temp = this.nodes[key]
-        const parent = temp.parent === null ? document.getElementsByTagName('body')[0] : this.nodes[temp.parent].obj
-        temp.obj = this.createDom('div', temp.style, key, temp.text)
-        parent.append(temp.obj)
-      }
-      const cancel = this.nodes['cancel'].obj
-      const confim = this.nodes['confim'].obj
-      cancel.addEventListener('mouseover', this.onmouseover(cancel), false)
-      cancel.addEventListener('mouseleave', this.onmouseover(cancel), false)
-      confim.addEventListener('mouseover', this.onmouseover(confim), false)
-      confim.addEventListener('mouseleave', this.onmouseover(confim), false)
+    confim(m) { // 确认框 确定 - 取消
+      this.nodes['title'].text = m.title || '提示'
+      this.addDom('nodes', 'content', m.msg)
+        .then(() => {
+          const cancel = this.nodes['cancel'].obj
+          const confim = this.nodes['confim'].obj
+          cancel.addEventListener('mouseover', () => this.onmouseover(cancel), false)
+          cancel.addEventListener('mouseleave', () => this.onmuseleave(cancel), false)
+          confim.addEventListener('mouseover', () => this.onmouseover(confim), false)
+          confim.addEventListener('mouseleave', () => this.onmuseleave(confim), false)
+          
+          cancel.addEventListener('click', () => this.clean('nodes'), false)
+          confim.addEventListener('click', () => {
+            if (m.function) m.function()
+            this.clean('nodes')
+          }, false)
+          this.nodes['mask'].obj.addEventListener('click', () => this.clean('nodes'), false)
+        })
+        .catch(err => {
+          console.error('创建失败'+err)
+        })
+    }
+    addDom(n, m, t) { // 添加dom元素
+      return new Promise((resolve, reject) => {
+        try {
+          this[n][m].text = t
+            for (var key in this[n]) {
+            const temp = this[n][key]
+            const parent = temp.parent === null ? document.getElementsByTagName('body')[0] : this[n][temp.parent].obj
+            temp.obj = this.createDom('div', temp.style, key, temp.text)
+            parent.append(temp.obj)
+          }
+          resolve()
+        } catch {
+          reject()
+        }
+      })
     }
     createDom(node, style = {}, className, text) { // 创建DOM以及css样式赋值
       const obj = document.createElement(node)
@@ -223,20 +275,25 @@
       }
       return obj
     }
+    /*
+    * 确认框按钮鼠标悬浮
+    * onmouseover - 鼠标悬浮
+    * onmuseleave - 鼠标离开
+    */
     onmouseover(obj) {
       obj.style.opacity = .8
     }
-    onmuseout(obj, style) {
+    onmuseleave(obj) {
       obj.style.opacity = 1
+    }
+    clean(name) { // 清除元素
+      this[name]['bar'].obj.parentElement.removeChild(this[name]['bar'].obj)
+      for (let key in this[name]) {
+        this.nodes[key].obj = null
+      }
     }
   }
 
   const msg = new Messages()
-
-  function messageShow() {
-    const obj = document.getElementsByClassName('messages-bar-dc')[0]
-    console.log(obj.style.display === 'none', obj.style.display)
-    obj.style.display = obj.style.display === 'none' ? 'block' : 'none'
-  }
 </script>
 </html>
