@@ -1,1 +1,170 @@
-js-demo
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>js-demo-circle</title>
+  <style>
+    *{ margin: 0; padding: 0 }
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+</body>
+<script>
+  /**
+  * circle - 生成环形进度条
+  */
+  class CIRCLE {
+    constructor(num = 0) {
+      this.num = num
+      this.colors = [ '#f7be16', '#293462', '#484c7f' ]
+      this.timer = null
+      this.time = 380
+      this.arr = [ 'circle-bar-dc', 'circle-dc', 'circle-left-dc', 'circle-right-dc', 'circle-mask-dc' ]
+      this.objs = {
+        'circle-bar-dc': {
+          obj: null,
+          parent: 'body',
+          style: {
+            width: '100%',
+            height: '100%',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(0,0,0,.8)'
+          }
+        },
+        'circle-dc': {
+          obj: null,
+          parent: 'circle-bar-dc',
+          style: {
+            width: '200px',
+            height: '200px',
+            position: 'absolute',
+            top: 'calc(50vh - 100px)',
+            left: 'calc(50vw - 100px)',
+            backgroundColor: '#f7be16',
+            borderRadius: '50%'
+          }
+        },
+        'circle-left-dc': {
+          obj: null,
+          parent: 'circle-dc',
+          style: {
+            width: '200px',
+            height: '200px',
+            position: 'fixed',
+            top: 'calc(50vh - 100px)',
+            left: 'calc(50vw - 100px)',
+            borderRadius: '50%',
+            clip: 'rect(0,auto,auto, 100px)',
+            backgroundColor: '#293462',
+            transform: 'rotate(0deg)',
+            transition: 'transform .05s',
+            zIndex: 2
+          }
+        },
+        'circle-right-dc': {
+          obj: null,
+          parent: 'circle-dc',
+          style: {
+            width: '200px',
+            height: '200px',
+            position: 'fixed',
+            top: 'calc(50vh - 100px)',
+            left: 'calc(50vw - 100px)',
+            borderRadius: '50%',
+            clip: 'rect(0, 100px, auto, 0)',
+            backgroundColor: '#293462',
+            transform: 'rotate(0deg)',
+            transition: 'transform .05s',
+            zIndex: 1
+          }
+        },
+        'circle-mask-dc': {
+          obj: null,
+          parent: 'circle-dc',
+          style: {
+            width: '160px',
+            height: '160px',
+            position: 'fixed',
+            top: 'calc(50vh - 80px)',
+            left: 'calc(50vw - 80px)',
+            borderRadius: '50%',
+            backgroundColor: 'lightblue',
+            lineHeight: '160px',
+            fontSize: '30px',
+            textAlign: 'center',
+            color: '#484c7f',
+            zIndex: 3
+          }
+        }
+      }
+    }
+    inits() { // 初始化 建立maskDom元素，背景透明黑色
+      for (let key in this.objs) {
+        const temp = this.objs[key]
+        const style = temp.style
+        const parents = temp.parent === 'body' ?
+          document.body
+          :
+          document.getElementsByClassName(temp.parent)[0]
+        this.objs[key].obj = this.createDom('div', style)
+        this.objs[key].obj.className = key
+        parents.append(this.objs[key].obj)
+      }
+      this.changePercentage(30)
+    }
+    changeCircle() {
+      const left = this.objs['circle-left-dc'].obj
+      const right = this.objs['circle-right-dc'].obj
+      const color = this.colors[0]
+      if ( this.num <= 50 ) {
+        const rotate = 'rotate(' +(this.num * 3.6)+'deg)'
+        left.style.transition = `transform .5s`
+        left.style.transform = rotate
+      } else {
+        const rotate = 'rotate(' +((this.num - 50) * 3.6)+'deg)'
+        left.style.transition = `none`
+        left.style.transform = `rotate(0deg)`
+        right.style.transform = rotate
+        left.style.backgroundColor = '#f7be16'
+      }
+    }
+    changePercentage(num = 0) {
+      this.timer = setInterval(() => {
+        if (num >= this.num) {
+          this.objs['circle-mask-dc'].obj.innerText = this.num + '%'
+          this.changeCircle()
+          this.num++
+        } else {
+          clearInterval(this.timer)
+          this.timer = null
+        }
+      }, 50)
+    }
+    createDom(node, style = {}) { // 创建DOM以及css样式赋值
+      const obj = document.createElement(node)
+      for(var key in style) {
+        obj.style[key] = style[key]
+      }
+      return obj
+    }
+    clean() { // 移除DOM
+      clearInterval(this.timer)
+      this.arr.reverse().map(t => {
+        this.objs[t].obj.remove()
+      })
+    }
+  }
+
+  const circle = new CIRCLE()
+  circle.inits()
+</script>
+</html>
