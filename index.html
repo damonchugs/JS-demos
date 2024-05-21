@@ -1,1 +1,169 @@
-js-demo
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>timeline</title>
+  <style>
+    * { margin: 0; padding: 0 }
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    /* timeline's css */
+    @font-face {
+      font-family: 'iconfont'; /* project id 1492664 */
+      src: url('//at.alicdn.com/t/font_1492664_71s6fytgqz.eot');
+      src: url('//at.alicdn.com/t/font_1492664_71s6fytgqz.eot?#iefix') format('embedded-opentype'),
+      url('//at.alicdn.com/t/font_1492664_71s6fytgqz.woff2') format('woff2'),
+      url('//at.alicdn.com/t/font_1492664_71s6fytgqz.woff') format('woff'),
+      url('//at.alicdn.com/t/font_1492664_71s6fytgqz.ttf') format('truetype'),
+      url('//at.alicdn.com/t/font_1492664_71s6fytgqz.svg#iconfont') format('svg');
+    }
+    .iconfont{
+      font-family:"iconfont" !important;
+      font-size: 18px;
+      font-style:normal;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-stroke-width: 0.2px;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .timeline-dc {
+      width: calc(100% - 60px);
+      height: max-content;
+      padding: 10px 30px 10px 30px;
+      position: relative;
+    }
+    .timeline-line-dc {
+      width: 3px;
+      height: 100%;
+      border-radius: 3px;
+      background-color: rgba(0,0,0, .4);
+      position: absolute;
+      top: 0;
+      left: calc(50% - 1.5px);
+    }
+    .timeline-row-dc {
+      width: calc(50% - 30px);
+      position: relative;
+    }
+    .timeline-icon-dc {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: #ffdc34;
+      text-align: center;
+      line-height: 22px;
+      border: 3px solid #4dd599;
+      position: absolute;
+      top: 20px;
+      right: -45px;
+    }
+    .timeline-time-dc {
+      position: absolute;
+      top: 25px;
+      right: -145px;
+    }
+    .timeline-panel-dc {
+      position: relative;
+      padding: 15px;
+      box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+      margin-top: 20px;
+    }
+    .timeline-panel-dc img{
+      width: 100%;
+      height: auto;
+      margin: 5px auto 0 auto;
+      border-radius: 5px;
+    }
+    .timeline-panel-title-dc {
+      font-size: 18px;
+      line-height: 28px;
+      font-weight: bold;
+    }
+    .timeline-panel-content-dc {
+      font-size: 16px;
+    }
+    .timeline-panel-tip-dc {
+      font-size: 14px;
+      color: rgba(0,0,0, .5);
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: right;
+    }
+    .right .timeline-time-dc {
+      right: -10px;
+    }
+    .right .timeline-panel-dc {
+      left: calc(100% + 60px);
+    }
+  </style>
+</head>
+<body>
+  <div class="timeline-dc"></div>
+</body>
+<script>
+  /**
+  * TimeLine - 生成timeline时间线
+  */
+  class TIMELINE {
+    constructor(obj, panels) {
+      this.obj = obj
+      this.panels = panels
+      this.icons = {
+        more: '&#xe70d;',
+        left: '&#xe61a;',
+        company: '&#xe787;',
+        project: '&#xe613;'
+      }
+      this.init()
+    }
+    init() { // 初始化数据
+      this.loadTimeLineRow()
+    }
+    loadTimeLineRow() { // 设置时间线内容
+      let htmls = '<div class="timeline-line-dc"></div>'
+      this.panels.map(t => {
+        htmls += `<div class="timeline-row-dc ${t.direction || 'left'}">
+                    <div class="timeline-time-dc">${t.time}</div>
+                    <div class="timeline-icon-dc"><i class="iconfont">${this.icons[t.icon]}</i></div>
+                    <div class="timeline-panel-dc">
+                    <p class="timeline-panel-title-dc">${t.title}</p>`
+        if (t.img) htmls += `<img src="${t.img}" />`
+        htmls +=      `<p class="timeline-panel-content-dc">${t.content}</p>
+                      <p class="timeline-panel-tip-dc">${t.tips}</p>
+                    </div>
+                  </div>`
+      })
+      this.obj.innerHTML = htmls
+    }
+  }
+
+  const panels = [
+    {
+      time: '2018-09-10',
+      icon: 'more',
+      title: 'Lorem ipsum dolor sit amet',
+      content: `Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales
+      leo, eget blandit nunc tortor eu nibh. Nullam mollis. Ut justo. Suspendisse potenti.`,
+      tips: '—— inspire',
+      direction: 'left',
+      img: ''
+    },
+    {
+      time: '2018-09-11',
+      icon: 'more',
+      title: 'Lorem ipsum dolor sit amet',
+      content: `Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales
+      leo, eget blandit nunc tortor eu nibh. Nullam mollis. Ut justo. Suspendisse potenti.`,
+      tips: '—— inspire',
+      direction: 'right',
+      img: 'https://ss0.bdstatic.com/k4oZeXSm1A5BphGlnYG/skin/183.jpg?2'
+    },
+  ]
+  const obj = document.getElementsByClassName('timeline-dc')[0]
+  const TL = new TIMELINE(obj, panels)
+</script>
+</html>
