@@ -1,1 +1,124 @@
-js-demo
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>loading</title>
+  <style>
+    * { margin: 0; padding: 0 }
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+</body>
+<script>
+  /**
+  * LOINGS - 生成loding条
+  * num - 生成的loding条数量
+  * timer - loading条变化的速度
+  * 
+  */
+  class LODINGS {
+    constructor(isClick = false, num, timer) {
+      this.num = num || 5
+      this.isClick = isClick
+      this.colors = [ '#5eb7b7', '#96d1c7', '#fc7978', '#ffafb0', '#dfddc7' ]
+      this.obj = null
+      this.container = null
+      this.timer = null
+      this.time = 380
+    }
+    inits() { // 初始化 建立maskDom元素，背景透明黑色
+      const objStyle = {
+        width: '100%',
+        height: '100%',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 9999999,
+        backgroundColor: 'rgba(0,0,0, .8)'
+      }
+      this.obj = this.createDom('div', objStyle)
+      this.obj.className = 'loading-dc'
+      document.body.append(this.obj)
+      this.createContainer()
+
+      if (this.isClick) {
+        const _this = this
+        this.obj.addEventListener('click', (e) => {
+          if (e.target.className === 'loading-dc') { // 去冒泡行为
+            _this.clean()
+          }
+        }, false)
+      }
+    }
+    createContainer() { // 创建LodingDOM父级元素
+      const wid = this.num * 10
+      const style = {
+        width: wid + 'px',
+        height: '30px',
+        display: 'flex',
+        marginLeft: 'calc(50vw - '+ wid/2 +'px)',
+        marginTop: 'calc(50vh - 15px)',
+      }
+      this.container = this.createDom('div', style)
+      this.obj.appendChild(this.container)
+      for (let i = 0; i < this.num; i++) {
+        this.createLoadingDom(i)
+      }
+      this.loadingActive()
+    }
+    createDom(node, style = {}) { // 创建DOM以及css样式赋值
+      const obj = document.createElement(node)
+      for(var key in style) {
+        obj.style[key] = style[key]
+      }
+      return obj
+    }
+    createLoadingDom(inv) { // 创建loding动画
+      const style = {
+        width: '5px',
+        height: '30px',
+        marginRight: '5px',
+        borderRadius: '2px',
+        position: 'relative',
+        top: 0,
+        left: 0,
+        transition: 'height .25s, top .25s',
+        backgroundColor: this.colors[inv]
+      }
+      const loadings = this.createDom('div', style)
+      this.container.appendChild(loadings)
+    }
+    loadingActive() { // 动画
+      let num = 0
+      this.timer = setInterval(() => {
+        Array.from(this.container.children).map((t, i) => {
+          t.style.height = i === num ? '40px' : '30px'
+          t.style.top = i === num ? '-5px' : '0px'
+        })
+        num = num === 4 ? 0 : num + 1
+      }, this.time)
+    }
+    clean() { // 移除DOM
+      clearInterval(this.timer)
+      Array.from(this.container.childNodes).map(t => {
+        this.container.removeChild(t)
+      })
+      this.container.remove()
+      this.obj.remove()
+      this.obj = null
+      this.container = null
+      this.timer = null
+      this.time = 380
+    }
+  }
+
+  const LD = new LODINGS()
+  LD.inits()
+</script>
+</html>
